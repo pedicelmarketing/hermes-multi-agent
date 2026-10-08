@@ -41,3 +41,6 @@ __pycache__/
 
 # Node modules anywhere in nested test workspaces
 **/node_modules/
+
+# graphify knowledge graph artifacts (see graphify-infra repo)
+graphify-out/

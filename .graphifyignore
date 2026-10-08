@@ -1,0 +1,6 @@
+# Minified/vendored bundles: 559 nodes (10.5% of the graph) came from d3.v7.min.js alone,
+# where mangled identifiers dominated the "god nodes" and community hubs with no signal.
+# Excluding them also drops the graph under graphify's 5000-node HTML viz limit.
+tools/d3.v7.min.js
+**/*.min.js
+**/node_modules/**

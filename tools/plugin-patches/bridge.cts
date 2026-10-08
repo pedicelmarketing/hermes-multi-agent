@@ -489,11 +489,16 @@ function createBridgeStatusTracker(statusFile: string, daemon: boolean): {
 }
 
 function isHermesChatRunning(): boolean {
+  // Match the interactive `hermes chat` command AND `hermes_cli.main … gateway`
+  // gateway processes. Gateways are the canonical Hermes runtime on multi-agent
+  // boxes; without recognising them, the daemon-mode stale-rule wrongly reports
+  // "disconnected" any time no interactive chat is open.
   try {
-    const out = childProcess.execFileSync("pgrep", ["-f", "hermes chat"], {
-      encoding: "utf8",
-      timeout: 1000,
-    });
+    const out = childProcess.execFileSync(
+      "pgrep",
+      ["-f", "hermes chat\\|hermes_cli\\.main.*gateway"],
+      { encoding: "utf8", timeout: 1000 },
+    );
     return out.trim().length > 0;
   } catch {
     return false;

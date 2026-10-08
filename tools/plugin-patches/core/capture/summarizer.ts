@@ -89,6 +89,16 @@ export interface Summarizer {
 export interface SummarizerContext {
   episodeId?: string;
   phase?: string;
+  /**
+   * Skip the LLM and return the deterministic heuristic summary directly.
+   * Used by the reflect-pass orphan-fallback insert: those rows would
+   * otherwise fire one summarize LLM call PER orphan step at recovery
+   * time — for a large recovered/closed episode that's hundreds of
+   * synchronous calls during cold-boot reflection, which rate-limits and
+   * stalls the bridge. The orphan rows' reflection is computed by the
+   * main batch pass right after, so a heuristic `summary` is sufficient.
+   */
+  heuristicOnly?: boolean;
 }
 
 /**
@@ -105,7 +115,7 @@ export function createSummarizer(opts: SummarizerOptions): Summarizer {
     // and as the input we re-anchor the LLM call against (so even if
     // the LLM returns garbage we still have a sensible string).
     const heuristic = heuristicSummary(step);
-    if (!opts.llm) return heuristic;
+    if (!opts.llm || context?.heuristicOnly) return heuristic;
 
     try {
       const result = await withTimeout(
